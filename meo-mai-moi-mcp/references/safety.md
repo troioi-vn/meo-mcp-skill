@@ -28,6 +28,9 @@ structured error result. Do not branch on prose alone.
 - retryable upstream or rate-limit errors: back off and retry later; do not
   repeat a write with a new idempotency key.
 
-Never paste access tokens, refresh tokens, callback parameters, personal API
-tokens, invitation URLs/codes, authorization headers, or full personal records
-into chat, prompts, issues, or logs.
+Never paste access tokens, refresh tokens, personal API tokens, invitation
+URLs/codes, authorization headers, or full personal records into chat, prompts,
+issues, or logs. The only connection exception is OpenClaw's short-lived,
+PKCE-bound authorization URL and single-use code in the same private one-to-one
+conversation. Exchange that code immediately, never repeat it, and never use
+this exception in a group, public channel, issue, screenshot, or durable log.

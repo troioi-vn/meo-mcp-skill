@@ -1,6 +1,6 @@
 ---
 name: meo-mai-moi-mcp
-description: "Connect to and safely use Meo Mai Moi through its OAuth MCP gateway for pet profiles, care and health records, habits, microchips, sharing, rehoming or placement, helper profiles, messages, groups, pet finances, notifications, and account workflows. Use when a user asks an OAuth-capable agent such as Codex, Cursor, or OpenClaw to manage Meo Mai Moi data, connect the Meo MCP server, choose Meo scopes, list pets, coordinate pet care, or automate a pet-related workflow. Do not use for direct REST API or personal-token integrations; use the separate meo-mai-moi skill instead."
+description: "Connect, authorize, and safely use Meo Mai Moi through its OAuth MCP gateway for pet profiles, care and health records, habits, microchips, sharing, rehoming or placement, helper profiles, messages, groups, pet finances, notifications, and account workflows. Use when a user asks an OAuth-capable agent such as Codex, Cursor, or OpenClaw to connect or authorize Meo Mai Moi, manage Meo data, choose scopes, list pets, coordinate pet care, or automate a pet-related workflow. In OpenClaw, configure the native MCP entry and initiate OAuth for the user when execution is available. Do not use for direct REST API or personal-token integrations; use the separate meo-mai-moi skill instead."
 ---
 
 # Meo Mai Moi MCP
@@ -11,24 +11,38 @@ and financial state; MCP is the agent-facing adapter.
 
 ## Connect
 
-1. Configure a remote Streamable HTTP MCP server at
-   `https://mcp.meo-mai-moi.com/mcp`.
-2. Start the client's OAuth flow. The user signs in to Meo Mai Moi and approves
-   only the scopes needed for the task.
-3. Discover tools before calling them. Start with `list_pets` for ordinary
-   pet-management work.
+1. Check whether the Meo MCP tools or a saved `meo-mai-moi` server are already
+   available. Reuse a valid connection instead of registering a duplicate.
+2. When the user explicitly asks to connect or authorize Meo, treat that as
+   authority to configure only the client's `meo-mai-moi` MCP entry. Initiate
+   OAuth yourself when the client and execution policy allow it; do not hand
+   routine setup commands back to the user.
+3. Configure the remote Streamable HTTP server at
+   `https://mcp.meo-mai-moi.com/mcp`, authenticate through OAuth, and discover
+   tools before calling them.
+4. After authorization, start with `list_pets` for ordinary pet-management
+   work. A newly configured client may need a reload or a fresh agent turn
+   before its MCP tools appear.
 
-Do not ask a user to paste an OAuth access token, refresh token, authorization
-URL, callback code, or Meo personal API token. OAuth belongs in the client.
+Never ask for an OAuth access token, refresh token, or Meo personal API token.
+Client-native OAuth belongs in the client. A headless OpenClaw flow has a
+narrow private-chat exception for its short-lived PKCE authorization URL and
+single-use code; follow the handling rules in the OpenClaw reference.
 
 Read [references/connection.md](references/connection.md) for client-neutral
-setup and scope selection. Read [references/safety.md](references/safety.md)
-before consequential writes or when a tool returns a structured error.
+setup and scope selection. When running in OpenClaw, read and follow
+[references/openclaw.md](references/openclaw.md). Read
+[references/safety.md](references/safety.md) before consequential writes or
+when a tool returns a structured error.
 
 ## Work safely
 
 - Request the narrowest domain scopes; do not treat a consent screen as a broad
   permission grant for unrelated work.
+- For an otherwise-unspecified request to “manage my pets,” use the documented
+  initial pet-management grant covering pet profiles, health records,
+  microchips, and finances. For a narrower named task, request only its domain
+  pair.
 - Discover current state and resolve stable IDs before mutating it.
 - For updates and deletes, preserve the version returned by the matching read.
 - Use a new idempotency key for each intended write. Reuse it only to retry the

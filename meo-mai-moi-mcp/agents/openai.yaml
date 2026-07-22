@@ -1,4 +1,12 @@
 interface:
   display_name: "Meo Mai Moi MCP"
   short_description: "Use Meo Mai Moi safely through MCP OAuth."
-  default_prompt: "Use $meo-mai-moi-mcp to connect safely to Meo Mai Moi and help with a pet task."
+  default_prompt: "Use $meo-mai-moi-mcp to connect and authorize Meo Mai Moi, then help with a pet task."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "meo-mai-moi"
+      description: "Meo Mai Moi OAuth MCP gateway"
+      transport: "streamable_http"
+      url: "https://mcp.meo-mai-moi.com/mcp"

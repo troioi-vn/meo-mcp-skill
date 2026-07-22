@@ -9,21 +9,29 @@ rehoming, sharing, messaging, groups, finances, notifications, and account
 workflows.
 
 The skill does not contain credentials and never asks users to paste tokens.
-It guides an agent through native OAuth, narrow scope selection, discovery,
-read-first workflows, stable targets, idempotency, and verification.
+It guides an agent through native OAuth, task-aware scope selection, discovery,
+read-first workflows, stable targets, idempotency, and verification. In
+OpenClaw, an explicit “connect” request lets the agent configure its own native
+MCP entry and initiate OAuth instead of handing setup commands back to you.
 
 ## Install
 
 Install the `meo-mai-moi-mcp/` folder using your agent's normal skill mechanism,
-then start a new session. For OpenClaw, use the ClawHub listing after publication.
-For Codex and Cursor, install the same portable folder in the client's skills
-location.
+then start a new session. For OpenClaw:
+
+```bash
+openclaw skills install @troioi-vn/meo-mai-moi-mcp
+```
+
+Then tell the agent: “Connect and authorize Meo Mai Moi.” The agent should add
+the native MCP server, give you the Meo consent link, verify the connection,
+and begin with `list_pets`. For Codex and Cursor, install the same portable
+folder in the client's skills location.
 
 ClawHub listing:
 [`@troioi-vn/meo-mai-moi-mcp`](https://clawhub.ai/troioi-vn/skills/meo-mai-moi-mcp)
 
-The MCP server itself is configured separately as a remote Streamable HTTP
-server at:
+The remote Streamable HTTP endpoint is:
 
 ```text
 https://mcp.meo-mai-moi.com/mcp
