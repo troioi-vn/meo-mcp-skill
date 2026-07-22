@@ -19,6 +19,9 @@ then start a new session. For OpenClaw, use the ClawHub listing after publicatio
 For Codex and Cursor, install the same portable folder in the client's skills
 location.
 
+ClawHub listing:
+[`@troioi-vn/meo-mai-moi-mcp`](https://clawhub.ai/troioi-vn/skills/meo-mai-moi-mcp)
+
 The MCP server itself is configured separately as a remote Streamable HTTP
 server at:
 
