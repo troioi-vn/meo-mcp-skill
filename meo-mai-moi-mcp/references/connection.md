@@ -8,37 +8,50 @@ Configure the remote Streamable HTTP endpoint:
 https://mcp.meo-mai-moi.com/mcp
 ```
 
-Use the client's native OAuth action. A normal flow is: configure the server,
-authenticate, sign in to Meo Mai Moi, approve scopes, discover tools, then make
-the smallest useful call. The public health endpoint is
+Use the client's native OAuth action. A normal flow is: choose scopes, configure
+the server, authenticate, sign in to Meo Mai Moi, approve scopes, confirm the
+client can reach the server, ensure tools are projected into the current session,
+then make the smallest useful call. The public health endpoint is
 `https://mcp.meo-mai-moi.com/health`.
 
-Codex, Cursor, OpenClaw, and other OAuth-capable MCP clients can use the same
-endpoint. Client configuration labels differ; do not invent a local token or
-work around native OAuth support.
+Codex, Cursor, OpenClaw, and other OAuth-capable MCP clients share the same
+endpoint. Do not invent a local token or work around native OAuth.
 
-When the user explicitly asks the agent to connect or authorize Meo, prefer the
-client's own MCP configuration surface and initiate OAuth on the user's behalf.
-Fall back to user-run commands only when the client cannot modify its MCP
-configuration or execution policy blocks the required command.
+When the user explicitly asks to connect or authorize Meo, prefer the client's
+own MCP configuration surface and initiate OAuth on their behalf. Fall back to
+user-run commands only when the client cannot modify its MCP configuration or
+execution policy blocks the required command.
 
-## Default pet-management grant
+## Named presets
 
-If the user asks only to “manage my pets” without naming a narrower task,
-request this OAuth scope string:
+### Everyday care (default for broad requests)
+
+Use when the user says “connect Meo Mai Moi,” “authorize Meo,” or “manage my
+pets” without naming a narrower task or selecting Full management:
 
 ```text
-pets:read pets:write health:read health:write microchips:read microchips:write finance:read finance:write
+pets:read pets:write health:read health:write habits:read habits:write microchips:read microchips:write
 ```
 
-This grant includes sensitive health and finance access and must remain visible
-on the consent screen. It does not authorize habits, sharing, placement,
-helpers, messages, groups, notifications, profile, or invitation workflows.
-When the user names a narrower task, request only that task's read/write pair.
-When a later tool reports `insufficient_scope`, merge only the missing domain
-pair and reauthorize.
+Covers ordinary pet profiles, health records, care habits, and microchips. It
+does **not** authorize sharing, placement, helpers, messages, groups, finance,
+notifications, profile, or invitations.
+
+### Full management (explicit selection only)
+
+Offer only after the user asks for complete access or clearly chooses this
+preset. Before authorizing, state plainly that it permits sensitive reads and
+writes across finances, messages, sharing, placement, groups, profile, and
+invitations. Never select Full management by inference.
+
+```text
+pets:read health:read habits:read microchips:read pets:write health:write habits:write microchips:write sharing:read sharing:write placement:read placement:write helpers:read helpers:write messages:read messages:write groups:read groups:write finance:read finance:write notifications:read notifications:write profile:read profile:write invitations:read invitations:write
+```
 
 ## Request scopes by task
+
+When the user names a narrower task, request only that task's scopes—not a
+preset.
 
 | Task family | Start with |
 |---|---|
@@ -55,16 +68,30 @@ pair and reauthorize.
 | Own profile, locale, owner-weight history | `profile:read` or `profile:read,profile:write` |
 | Account invitations | `invitations:read` or `invitations:read,invitations:write` |
 
-Write tools require their matching read scope because a safe workflow begins by
-reading the actual target. A tool may require multiple domain scopes; discover
-its schema and description before requesting extra consent.
+Write tools require their matching read scope. A tool may require multiple
+domain scopes; discover its schema before requesting extra consent.
+
+When a later tool reports `insufficient_scope`, merge only the missing domain
+pair and reauthorize unless the user explicitly switches preset.
+
+## Readiness states
+
+Do not treat these as one state:
+
+1. **Configured** — server entry saved.
+2. **OAuth success** — tokens exchanged.
+3. **MCP probe success** — live reachability/auth check passed.
+4. **Native tool projection** — Meo tools are callable in this session.
+
+A successful probe does not prove the current chat can call Meo tools. An empty
+or unrelated `tool_search` result does not prove the Meo server lacks tools.
 
 ## First-call pattern
 
-For a request such as “show my pets,” connect with `pets:read`, discover tools,
-then call `list_pets` with `{}`. Summarize only the information needed for the
-user's request.
+For “show my pets,” connect with `pets:read` (or Everyday care when the request
+was broad), confirm projection, discover tools, then call `list_pets` with `{}`.
+Summarize only what the user needs.
 
 For a requested change, first call the matching list/detail tool. Use the
-returned stable ID and version in the write input, choose one new idempotency
-key, then read the target again to verify the intended state.
+returned stable ID and version, choose one new idempotency key, then read again
+to verify.

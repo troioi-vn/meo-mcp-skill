@@ -9,10 +9,11 @@ rehoming, sharing, messaging, groups, finances, notifications, and account
 workflows.
 
 The skill does not contain credentials and never asks users to paste tokens.
-It guides an agent through native OAuth, task-aware scope selection, discovery,
+It guides an agent through native OAuth, named scope presets, discovery,
 read-first workflows, stable targets, idempotency, and verification. In
 OpenClaw, an explicit “connect” request lets the agent configure its own native
-MCP entry and initiate OAuth instead of handing setup commands back to you.
+MCP entry, complete OAuth, probe the server, and ask you to start a new session
+(`/new` or `/reset`) before the first Meo call.
 
 ## Install
 
@@ -24,9 +25,10 @@ openclaw skills install @troioi-vn/meo-mai-moi-mcp
 ```
 
 Then tell the agent: “Connect and authorize Meo Mai Moi.” The agent should add
-the native MCP server, give you the Meo consent link, verify the connection,
-and begin with `list_pets`. For Codex and Cursor, install the same portable
-folder in the client's skills location.
+the native MCP server with the Everyday care preset, give you the Meo consent
+link, probe the connection, ask you to `/new`, and begin with `list_pets` in
+that fresh session. For Codex and Cursor, install the same portable folder in
+the client's skills location.
 
 ClawHub listing:
 [`@troioi-vn/meo-mai-moi-mcp`](https://clawhub.ai/troioi-vn/skills/meo-mai-moi-mcp)
@@ -39,6 +41,14 @@ https://mcp.meo-mai-moi.com/mcp
 
 Authenticate through Meo OAuth, discover tools, and start with a narrow read
 such as `list_pets`.
+
+## Scope presets
+
+- **Everyday care** (default for “connect Meo Mai Moi”): pets, health, habits,
+  and microchips read/write.
+- **Full management**: all gateway scopes, only after explicit selection and a
+  clear warning about sensitive domains.
+- A named narrower task still requests only that task's scopes.
 
 ## Direct API versus MCP
 
