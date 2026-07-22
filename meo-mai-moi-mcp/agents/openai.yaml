@@ -1,0 +1,4 @@
+interface:
+  display_name: "Meo Mai Moi MCP"
+  short_description: "Use Meo Mai Moi safely through MCP OAuth."
+  default_prompt: "Use $meo-mai-moi-mcp to connect safely to Meo Mai Moi and help with a pet task."
